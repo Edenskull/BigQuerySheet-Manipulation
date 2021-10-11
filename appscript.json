@@ -1,0 +1,14 @@
+{
+    "timeZone": "America/New_York",
+    "dependencies": {
+        "enabledAdvancedServices": [
+            {
+                "userSymbol": "BigQuery",
+                "version": "v2",
+                "serviceId": "bigquery"
+            }
+        ]
+    },
+    "exceptionLogging": "STACKDRIVER",
+    "runtimeVersion": "V8"
+}
