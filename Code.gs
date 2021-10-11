@@ -15,6 +15,9 @@ function onOpen() {
     .addToUi();
 }
 
+/**
+ * Function to update the current document (Spreadsheet) configuration. With this all the collaborator using a same Spreadsheet can execute event with the same configuration.
+ */
 function updateConfiguration() {
   let pidResp = ui.prompt(PROMPTTITLE, "Please provide the GCP project id:", ui.ButtonSet.OK_CANCEL);
   if (pidResp.getSelectedButton() == ui.Button.CANCEL || pidResp.getResponseText().trim() == "") {
@@ -43,6 +46,9 @@ function updateConfiguration() {
   ui.alert(PROMPTTITLE, "The configuration has been updated!", ui.ButtonSet.OK)
 }
 
+/**
+ * Function to show the user the current document (Spreadsheet) configuration.
+ */
 function showConfiguration() {
   var props = PropertiesService.getDocumentProperties().getProperties();
   ui.alert(
@@ -56,14 +62,24 @@ function showConfiguration() {
   );
 }
 
+/**
+ * Function linked to the menu. Run the data manipulation with parameter append data.
+ */
 function appendData() {
-
+  manipulateData(false);
 }
 
+/**
+ * Function linked to the menu. Run the data manipulation with parameter update data.
+ */
 function updateData() {
-
+  manipulateData(true);
 }
 
+/**
+ * Function to gather the information, the data and the job that need to be done
+ * @param {Bool} update - This parameter define if data need to be truncated (true) or simply append to the current data in BigQuery.
+ */
 function manipulateData(update) {
   var sheet;
   var props = PropertiesService.getDocumentProperties().getProperties();
@@ -118,6 +134,10 @@ function manipulateData(update) {
   insertData(props["pid"], blob, props["dataset"], props["table"], update)
 }
 
+/**
+ * Function that check if the Sheet exists in the current Spreadsheet. 
+ * @returns {Sheet or null} - Return the sheet object if it's found or null if not.
+ */
 function checkIfSheetExists() {
   try {
     let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PropertiesService.getDocumentProperties().getProperty('sheetName'));
@@ -128,6 +148,10 @@ function checkIfSheetExists() {
   }
 }
 
+/**
+ * Function that create a new sheet with current name in configuration.
+ * @returns {Sheet or null} - Return the sheet object newly created or null if it fails to create.
+ */
 function createSheet() {
   try {
     let sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(PropertiesService.getDocumentProperties().getProperty("sheetName"), 0);
@@ -138,6 +162,12 @@ function createSheet() {
   }
 }
 
+/**
+ * Function that check if the dataset in the configuration exists in the GCP project defined by the Project ID
+ * @param {String} projectId - Project name that should appear in the configuration.
+ * @param {String} datasetId - Dataset name that should appear in the configuration.
+ * @returns {Bool} - Return true if the process work else it return false.
+ */
 function checkIfDatasetExists(projectId, datasetId) {
   try {
     BigQuery.Datasets.get(projectId, datasetId);
@@ -147,6 +177,12 @@ function checkIfDatasetExists(projectId, datasetId) {
   }
 }
 
+/**
+ * Function that will create the dataset in the GCP project defined by the Project ID.
+ * @param {String} projectId - Project name that should appear in the configuration.
+ * @param {String} datasetId - Dataset name that should appear in the configuration.
+ * @returns {Bool} - Return true if the process work else it return false.
+ */
 function createDataset(projectId, datasetId) {
   try {
     let dataset = {
@@ -164,6 +200,14 @@ function createDataset(projectId, datasetId) {
   }
 }
 
+/**
+ * Function that create insert data job in BigQuery.
+ * @param {String} projectId - Project name that should appear in the configuration.
+ * @param {Blob} blob - The CSV blob to import in BigQuery with all fetched data.
+ * @param {String} datasetId - Dataset name that should appear in the configuration.
+ * @param {String} tableId - Table name that should appear in the configuration.
+ * @param {Bool} update - This parameter define if data need to be truncated (true) or simply append to the current data in BigQuery.
+ */
 function insertData(projectId, blob, datasetId, tableId, update) {
   // Create the BigQuery load job config. For more information, see:
   // https://developers.google.com/apps-script/advanced/bigquery
