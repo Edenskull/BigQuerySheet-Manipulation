@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/Edenskull/BigQuerySheet-Manipulation/.github/assets/Banner.png">
+  <img src="https://raw.githubusercontent.com/Edenskull/BigQuerySheet-Manipulation/main/.github/assets/Banner.png">
 </div>
 
 <div align="center">
