@@ -136,7 +136,7 @@ function manipulateData(update) {
 
 /**
  * Function that check if the Sheet exists in the current Spreadsheet. 
- * @returns {Sheet or null} - Return the sheet object if it's found or null if not.
+ * @returns {Sheet|null} - Return the sheet object if it's found or null if not.
  */
 function checkIfSheetExists() {
   try {
@@ -150,7 +150,7 @@ function checkIfSheetExists() {
 
 /**
  * Function that create a new sheet with current name in configuration.
- * @returns {Sheet or null} - Return the sheet object newly created or null if it fails to create.
+ * @returns {Sheet|null} - Return the sheet object newly created or null if it fails to create.
  */
 function createSheet() {
   try {
