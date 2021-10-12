@@ -84,30 +84,19 @@ function manipulateData(update) {
   var sheet;
   var props = PropertiesService.getDocumentProperties().getProperties();
   if (!checkIfDatasetExists(props["pid"], props["dataset"])) {
-    let createDatasetResp = ui.prompt(PROMPTTITLE, "Do you want to create a dataset ?", ui.ButtonSet.YES_NO);
+    let createDatasetResp = ui.alert(PROMPTTITLE, "The dataset doesn't exists. Do you want to create a dataset ?", ui.ButtonSet.YES_NO);
     if (createDatasetResp.getSelectedButton() == ui.Button.YES) {
       let hasCreatedDataset = createDataset(props["pid"], props["dataset"]);
       if (!hasCreatedDataset) {
         return;
       }
     } else {
-      ui.prompt(PROMPTTITLE, "The process has been stopped because the user don't want to create a dataset from script.", ui.ButtonSet.OK);
+      ui.alert(PROMPTTITLE, "The process has been stopped because the user don't want to create a dataset from script.", ui.ButtonSet.OK);
       return;
     }
   }
   if (!checkIfSheetExists()) {
-    let createSheetResp = ui.prompt(PROMPTTITLE, "Do you want to insert a new sheet ?", ui.ButtonSet.YES_NO);
-    if (createSheetResp.getSelectedButton() == ui.Button.YES) {
-      let hasCreatedSheet = createSheet();
-      if (hasCreatedSheet == null) {
-        return;
-      } else {
-        sheet = hasCreatedSheet;
-      }
-    } else {
-      ui.prompt(PROMPTTITLE, "The process has been stopped because the user don't want to insert a sheet from script.", ui.ButtonSet.OK);
-      return;
-    }
+    return;
   }
   let rows = sheet.getDataRange().getValues();
 
@@ -143,21 +132,7 @@ function checkIfSheetExists() {
     let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PropertiesService.getDocumentProperties().getProperty('sheetName'));
     return sheet;
   } catch (err) {
-    ui.alert(PROMPTTITLE, "Sheet name provided doesn't exists", ui.ButtonSet.OK)
-    return null;
-  }
-}
-
-/**
- * Function that create a new sheet with current name in configuration.
- * @returns {Sheet|null} - Return the sheet object newly created or null if it fails to create.
- */
-function createSheet() {
-  try {
-    let sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet(PropertiesService.getDocumentProperties().getProperty("sheetName"), 0);
-    return sheet;
-  } catch (err) {
-    ui.alert(PROMPTTITLE, "An error occured: " + err, ui.ButtonSet.OK)
+    ui.alert(PROMPTTITLE, "The Sheet name in the configuration is invalid. Please check the configuration.", ui.ButtonSet.OK)
     return null;
   }
 }

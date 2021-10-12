@@ -39,9 +39,6 @@ Google App Scripts to link Google sheets to bigquery table
 <dt><a href="#checkIfSheetExists">checkIfSheetExists()</a> ⇒ <code>Sheet</code> | <code>null</code></dt>
 <dd><p>Function that check if the Sheet exists in the current Spreadsheet.</p>
 </dd>
-<dt><a href="#createSheet">createSheet()</a> ⇒ <code>Sheet</code> | <code>null</code></dt>
-<dd><p>Function that create a new sheet with current name in configuration.</p>
-</dd>
 <dt><a href="#checkIfDatasetExists">checkIfDatasetExists(projectId, datasetId)</a> ⇒ <code>Bool</code></dt>
 <dd><p>Function that check if the dataset in the configuration exists in the GCP project defined by the Project ID</p>
 </dd>
@@ -101,13 +98,6 @@ Function that check if the Sheet exists in the current Spreadsheet.
 
 **Kind**: global function
 **Returns**: <code>Sheet</code> \| <code>null</code> - - Return the sheet object if it's found or null if not.
-<a name="createSheet"></a>
-
-## createSheet() ⇒ <code>Sheet</code> \| <code>null</code>
-Function that create a new sheet with current name in configuration.
-
-**Kind**: global function
-**Returns**: <code>Sheet</code> \| <code>null</code> - - Return the sheet object newly created or null if it fails to create.
 <a name="checkIfDatasetExists"></a>
 
 ## checkIfDatasetExists(projectId, datasetId) ⇒ <code>Bool</code>
