@@ -42,9 +42,6 @@ Google App Scripts to link Google sheets to bigquery table
 <dt><a href="#checkIfDatasetExists">checkIfDatasetExists(projectId, datasetId)</a> ⇒ <code>Bool</code></dt>
 <dd><p>Function that check if the dataset in the configuration exists in the GCP project defined by the Project ID</p>
 </dd>
-<dt><a href="#createDataset">createDataset(projectId, datasetId)</a> ⇒ <code>Bool</code></dt>
-<dd><p>Function that will create the dataset in the GCP project defined by the Project ID.</p>
-</dd>
 <dt><a href="#insertData">insertData(projectId, blob, datasetId, tableId, update)</a></dt>
 <dd><p>Function that create insert data job in BigQuery.</p>
 </dd>
@@ -102,19 +99,6 @@ Function that check if the Sheet exists in the current Spreadsheet.
 
 ## checkIfDatasetExists(projectId, datasetId) ⇒ <code>Bool</code>
 Function that check if the dataset in the configuration exists in the GCP project defined by the Project ID
-
-**Kind**: global function
-**Returns**: <code>Bool</code> - - Return true if the process work else it return false.
-
-| Param | Type | Description |
-| --- | --- | --- |
-| projectId | <code>String</code> | Project name that should appear in the configuration. |
-| datasetId | <code>String</code> | Dataset name that should appear in the configuration. |
-
-<a name="createDataset"></a>
-
-## createDataset(projectId, datasetId) ⇒ <code>Bool</code>
-Function that will create the dataset in the GCP project defined by the Project ID.
 
 **Kind**: global function
 **Returns**: <code>Bool</code> - - Return true if the process work else it return false.

@@ -39,10 +39,14 @@ function updateConfiguration() {
     ui.alert(PROMPTTITLE, ALERTMESSAGECANCEL, ui.ButtonSet.OK);
     return;
   }
-  PropertiesService.getDocumentProperties().setProperty("pid", pidResp.getResponseText().trim().toLowerCase());
-  PropertiesService.getDocumentProperties().setProperty("dataset", datasetResp.getResponseText().trim());
-  PropertiesService.getDocumentProperties().setProperty("table", tableResp.getResponseText().trim());
-  PropertiesService.getDocumentProperties().setProperty("sheetName", tableResp.getResponseText().trim());
+  let pidValue = pidResp.getResponseText();
+  let datasetValue = datasetResp.getResponseText();
+  let tableValue = tableResp.getResponseText();
+  let sidValue = sidResp.getResponseText();
+  PropertiesService.getDocumentProperties().setProperty("pid", pidValue.trim().toLowerCase());
+  PropertiesService.getDocumentProperties().setProperty("dataset", datasetValue.trim());
+  PropertiesService.getDocumentProperties().setProperty("table", tableValue.trim());
+  PropertiesService.getDocumentProperties().setProperty("sheetName", sidValue.trim());
   ui.alert(PROMPTTITLE, "The configuration has been updated!", ui.ButtonSet.OK)
 }
 
@@ -81,23 +85,20 @@ function updateData() {
  * @param {Bool} update - This parameter define if data need to be truncated (true) or simply append to the current data in BigQuery.
  */
 function manipulateData(update) {
-  var sheet;
   var props = PropertiesService.getDocumentProperties().getProperties();
   if (!checkIfDatasetExists(props["pid"], props["dataset"])) {
-    let createDatasetResp = ui.alert(PROMPTTITLE, "The dataset doesn't exists. Do you want to create a dataset ?", ui.ButtonSet.YES_NO);
-    if (createDatasetResp.getSelectedButton() == ui.Button.YES) {
-      let hasCreatedDataset = createDataset(props["pid"], props["dataset"]);
-      if (!hasCreatedDataset) {
-        return;
-      }
-    } else {
-      ui.alert(PROMPTTITLE, "The process has been stopped because the user don't want to create a dataset from script.", ui.ButtonSet.OK);
-      return;
-    }
-  }
-  if (!checkIfSheetExists()) {
+    ui.alert(PROMPTTITLE, "The dataset doesn't exists. Please check your configuration or create the dataset in GCP console.", ui.ButtonSet.OK);
     return;
   }
+  let sheet = checkIfSheetExists()
+  if (sheet == null) {
+    return;
+  }
+  if (!getAllTables(props["pid"], props["dataset"]).includes(props["table"])) {
+    ui.alert(PROMPTTITLE, "The table doesnt't exists. Please check your configuration or create this table manually with GCP Console.", ui.ButtonSet.OK);
+    return;
+  }
+
   let rows = sheet.getDataRange().getValues();
 
   // Normalize the headers (first row) to valid BigQuery column names.
@@ -153,29 +154,6 @@ function checkIfDatasetExists(projectId, datasetId) {
 }
 
 /**
- * Function that will create the dataset in the GCP project defined by the Project ID.
- * @param {String} projectId - Project name that should appear in the configuration.
- * @param {String} datasetId - Dataset name that should appear in the configuration.
- * @returns {Bool} - Return true if the process work else it return false.
- */
-function createDataset(projectId, datasetId) {
-  try {
-    let dataset = {
-      datasetReference: {
-        projectId: projectId,
-        datasetId: datasetId
-      }
-    }
-    BigQuery.Datasets.insert(dataset, projectId);
-    ui.alert(PROMPTTITLE, "The Dataset has been correctly created!", ui.ButtonSet.OK);
-    return true;
-  } catch (err) {
-    ui.alert(PROMPTTITLE, "An error occured: " + err + ". Please check the configuration and the permissions on the project", ui.ButtonSet.OK);
-    return false;
-  }
-}
-
-/**
  * Function that create insert data job in BigQuery.
  * @param {String} projectId - Project name that should appear in the configuration.
  * @param {Blob} blob - The CSV blob to import in BigQuery with all fetched data.
@@ -202,8 +180,25 @@ function insertData(projectId, blob, datasetId, tableId, update) {
 
   try {
     BigQuery.Jobs.insert(loadJob, projectId, blob);
-    ui.alert(PROMPTTITLE, `Load job started. Click here to check your jobs: https://console.cloud.google.com/bigquery?project=${projectId}&page=jobs`, ui.Button.OK);
+    ui.alert(PROMPTTITLE, `Load job started. Click here to check your jobs: https://console.cloud.google.com/bigquery?project=${projectId}&page=jobs`, ui.ButtonSet.OK);
   } catch (err) {
     ui.alert(PROMPTTITLE, "An error occured: " + err + ". Please check the configuration and the permissions on the project", ui.ButtonSet.OK);
   }
+}
+
+function getAllTables(projectId, datasetId) {
+  const options = {
+    fields: "nextPageToken,tables(tableReference/tableId)"
+  }
+  var tables = [];
+  do {
+    var search = BigQuery.Tables.list(projectId, datasetId, options);
+    options.pageToken = search.nextPageToken;
+    if (search.tables && search.tables.length) {
+      search.tables.forEach((table) => {
+        tables.push(table.tableReference.tableId);
+      })
+    }
+  } while (options.pageToken);
+  return tables;
 }
